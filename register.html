@@ -2,98 +2,488 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register | CybVars</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | CybVars Password Manager</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f4f7fa; color: #333; }
-    .container { max-width: 500px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    h2 { text-align: center; margin-bottom: 1.5rem; }
-    label { display: block; margin-top: 1rem; font-weight: 600; }
-    input, button { width: 100%; padding: 0.75rem; margin-top: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
-    input[readonly] { background: #e9ecef; }
-    button { background: #4c51bf; color: #fff; border: none; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #5a67d8; }
-    button:disabled { background: #ccc; cursor: not-allowed; }
-    #map { height: 200px; margin-top: 1rem; border: 1px solid #ddd; border-radius: 4px; }
-    .hidden { display: none; }
-    .otp-section { margin-top: 1.5rem; }
-    .error { color: #e53e3e; font-size: 0.875rem; margin-top: 0.25rem; }
-    .success { color: #38a169; font-size: 0.875rem; margin-top: 0.25rem; }
-    .resend-link { text-align: center; margin-top: 1rem; color: #4c51bf; cursor: pointer; text-decoration: underline; }
-    .resend-link.disabled { color: #ccc; cursor: not-allowed; text-decoration: none; }
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --danger: #e53e3e;
+      --success: #38a169;
+      --warning: #dd6b20;
+      --light: #f8f9fa;
+      --dark: #1a202c;
+      --gray: #718096;
+      --light-gray: #e2e8f0;
+      --border-radius: 8px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSg2Nyw5NywyMzgsMC4wNSkiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .back-btn:hover {
+      color: var(--primary-dark);
+      transform: translateX(-3px);
+    }
+
+    .register-container {
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .register-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), #3a0ca3);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo img {
+      height: 48px;
+      margin-bottom: 0.5rem;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--light-gray);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+      background-color: var(--light);
+    }
+
+    input[readonly] {
+      background-color: var(--light-gray);
+      cursor: not-allowed;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--gray);
+      transition: var(--transition);
+    }
+
+    .password-toggle:hover {
+      color: var(--primary);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    #map {
+      height: 200px;
+      margin-top: 0.5rem;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--light-gray);
+      z-index: 1;
+    }
+
+    .location-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background-color: var(--light-gray);
+      color: var(--dark);
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .location-btn:hover {
+      background-color: #d1d5db;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      background-color: var(--light-gray);
+      color: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .success-message {
+      color: var(--success);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* OTP Section */
+    .otp-section {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .otp-section h2 {
+      margin-bottom: 1rem;
+    }
+
+    .otp-section p {
+      margin-bottom: 1.5rem;
+      color: var(--gray);
+    }
+
+    .otp-input {
+      letter-spacing: 0.5rem;
+      font-size: 1.5rem;
+      text-align: center;
+      padding: 0.5rem 1rem;
+    }
+
+    .resend-container {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .resend-text {
+      color: var(--gray);
+    }
+
+    .resend-link {
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .resend-link:hover {
+      text-decoration: underline;
+    }
+
+    .resend-link.disabled {
+      color: var(--gray);
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .register-container {
+        padding: 1.5rem;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .back-btn {
+        top: 1rem;
+        left: 1rem;
+      }
+
+      .register-container {
+        padding: 1.25rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <a href="index.html"
-     style="position:absolute;top:20px;left:20px;display:flex;align-items:center;gap:7px;color:#4c51bf;font-size:1rem;font-weight:500;text-decoration:none;">
-    <span style="font-size:1.2em;">&#8592;</span> Back
+  <a href="index.html" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+    <span>Back to Home</span>
   </a>
 
-  <div class="container">
-    <h2>Create Your CybVars Account</h2>
-
-    <!-- Registration form -->
+  <div class="register-container">
+    <div class="logo">
+      <img src="logo.png" alt="CybVars Logo">
+      <h1>CybVars</h1>
+    </div>
+    
+    <h2>Create Your Account</h2>
+    
+    <!-- Registration Form -->
     <form id="regForm">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" required>
-      <div id="nameError" class="error hidden"></div>
-
-      <label for="dob">Date of Birth</label>
-      <input type="date" id="dob" required>
-      <div id="dobError" class="error hidden"></div>
-
-      <label for="age">Age</label>
-      <input type="text" id="age" readonly>
-
-      <label>Location (click on map or use current location)</label>
-      <div id="map"></div>
-      <button type="button" id="btnLocate">Use My Location</button>
-      <div id="locationError" class="error hidden"></div>
-
-      <label for="location">Address</label>
-      <input type="text" id="location" placeholder="Selected address" readonly>
-
-      <div style="display:flex; gap:1rem; margin-top:0.5rem;">
-        <div style="flex:1;">
-          <label for="latitude">Latitude</label>
-          <input type="text" id="latitude" readonly>
-        </div>
-        <div style="flex:1;">
-          <label for="longitude">Longitude</label>
-          <input type="text" id="longitude" readonly>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="name" placeholder="" required>
+          </div>
+          <div id="nameError" class="error-message hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <span></span>
+          </div>
         </div>
       </div>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" required>
-      <div id="emailError" class="error hidden"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <div class="input-wrapper">
+            <input type="date" id="dob" required>
+          </div>
+          <div id="dobError" class="error-message hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <span></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="text" id="age" >
+        </div>
+      </div>
 
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" pattern="[0-9]{10}" placeholder="10-digit number" required>
-      <div id="phoneError" class="error hidden"></div>
+      <div class="form-group">
+        <label>Location</label>
+        <div id="map"></div>
+        <button type="button" id="btnLocate" class="location-btn">
+          <i class="fas fa-location-arrow"></i>
+          Use My Current Location
+        </button>
+        <div id="locationError" class="error-message hidden">
+          <i class="fas fa-exclamation-circle"></i>
+          <span></span>
+        </div>
+      </div>
 
-      <label for="password">Password (min 8 characters)</label>
-      <input type="password" id="password" required minlength="8">
-      <div id="passwordError" class="error hidden"></div>
+      <div class="form-group">
+        <label for="location">Address</label>
+        <input type="text" id="location" placeholder="Selected address will appear here" >
+      </div>
 
-      <button type="submit" id="btnRegister">Register</button>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="latitude">Latitude</label>
+          <input type="text" id="latitude" >
+        </div>
+        <div class="form-group">
+          <label for="longitude">Longitude</label>
+          <input type="text" id="longitude" >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-wrapper">
+          <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+        <div id="emailError" class="error-message hidden">
+          <i class="fas fa-exclamation-circle"></i>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <div class="input-wrapper">
+          <input type="tel" id="phone" pattern="[0-9]{10}" placeholder="10-digit number" required>
+        </div>
+        <div id="phoneError" class="error-message hidden">
+          <i class="fas fa-exclamation-circle"></i>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password (min 8 characters)</label>
+        <div class="input-wrapper">
+          <input type="password" id="password" placeholder="••••••••" required minlength="8">
+          <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+        <div id="passwordError" class="error-message hidden">
+          <i class="fas fa-exclamation-circle"></i>
+          <span></span>
+        </div>
+      </div>
+
+      <button type="submit" id="btnRegister" class="btn">
+        <span id="btnRegisterText">Create Account</span>
+        <span id="btnRegisterSpinner" class="hidden"><i class="fas fa-spinner fa-spin"></i></span>
+      </button>
     </form>
 
-    <!-- OTP section (initially hidden) -->
-    <div id="otpSection" class="container hidden" style="text-align:center;">
-      <h2>Enter OTP</h2>
-      <p>We've sent a 6-digit code to <span id="registeredEmail" style="font-weight:600;"></span></p>
+    <!-- OTP Verification Section -->
+    <div id="otpSection" class="otp-section hidden">
+      <h2>Verify Your Email</h2>
+      <p>We've sent a 6-digit verification code to <strong id="registeredEmail"></strong></p>
+      
       <form id="otpForm">
-        <label for="otp">OTP Code</label>
-        <input type="text" id="otp" maxlength="6" required pattern="\d{6}" inputmode="numeric">
-        <div id="otpError" class="error hidden"></div>
-        <div id="otpSuccess" class="success hidden"></div>
-        <button type="submit" id="btnVerify">Verify OTP</button>
+        <div class="form-group">
+          <label for="otp">Verification Code</label>
+          <input type="text" id="otp" class="otp-input" maxlength="6" required pattern="\d{6}" inputmode="numeric">
+          <div id="otpError" class="error-message hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <span></span>
+          </div>
+          <div id="otpSuccess" class="success-message hidden">
+            <i class="fas fa-check-circle"></i>
+            <span></span>
+          </div>
+        </div>
+        
+        <button type="submit" id="btnVerify" class="btn">
+          <span id="btnVerifyText">Verify Account</span>
+          <span id="btnVerifySpinner" class="hidden"><i class="fas fa-spinner fa-spin"></i></span>
+        </button>
       </form>
-      <div id="resendContainer">
-        <span id="resendText">Didn't receive the code?</span>
-        <span id="btnResend" class="resend-link">Resend OTP</span>
+      
+      <div class="resend-container">
+        <span class="resend-text">Didn't receive the code?</span>
+        <span id="btnResend" class="resend-link">Resend Code</span>
         <span id="resendTimer" class="resend-link disabled hidden">
           Resend available in <span id="countdown">30</span>s
         </span>
@@ -101,190 +491,346 @@
     </div>
   </div>
 
-  <audio id="bg-music" autoplay loop>
-  <source src="background.mp3" type="audio/mpeg">
-  Your browser does not support the audio tag.
-</audio>
-<script src="music.js"></script> <!-- Your new music logic -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <audio id="bg-music" loop>
+    <source src="background.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="music.js"></script>
   <script>
-    // ── NEW: Auto-show OTP if redirected from login.html ─────────
+    // Initialize map
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    let marker = null;
     let registeredEmail = null;
-    window.addEventListener('DOMContentLoaded', () => {
+
+    // Check if redirected from login for verification
+    document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       if (params.get('action') === 'verify' && params.get('email')) {
         registeredEmail = params.get('email');
-        document.getElementById('registeredEmail').textContent = registeredEmail;
-        document.getElementById('regForm').classList.add('hidden');
-        document.getElementById('otpSection').classList.remove('hidden');
-        document.getElementById('otp').focus();
-        if (typeof startResendTimer === 'function') startResendTimer();
+        showOTPSection(registeredEmail);
       }
+      
+      // Lower music volume
+      const music = document.getElementById('bg-music');
+      if (music) music.volume = 0.3;
     });
-    // ─────────────────────────────────────────────────────────────
 
-    // Form-field helpers
+    // Helper functions
     function showError(fieldId, message) {
       const el = document.getElementById(`${fieldId}Error`);
-      el.textContent = message;
+      el.querySelector('span').textContent = message;
       el.classList.remove('hidden');
+      el.classList.add('shake');
+      setTimeout(() => el.classList.remove('shake'), 400);
     }
+
     function clearError(fieldId) {
       const el = document.getElementById(`${fieldId}Error`);
-      el.textContent = '';
+      el.querySelector('span').textContent = '';
       el.classList.add('hidden');
     }
+
     function showSuccess(fieldId, message) {
       const el = document.getElementById(`${fieldId}Success`);
-      el.textContent = message;
+      el.querySelector('span').textContent = message;
       el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 3000);
     }
-    function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    function toggleLoading(buttonId, isLoading) {
+      const btn = document.getElementById(buttonId);
+      const text = document.getElementById(`${buttonId}Text`);
+      const spinner = document.getElementById(`${buttonId}Spinner`);
+      
+      btn.disabled = isLoading;
+      if (isLoading) {
+        text.classList.add('hidden');
+        spinner.classList.remove('hidden');
+      } else {
+        text.classList.remove('hidden');
+        spinner.classList.add('hidden');
+      }
+    }
+
+    function showOTPSection(email) {
+      registeredEmail = email;
+      document.getElementById('registeredEmail').textContent = email;
+      document.getElementById('regForm').classList.add('hidden');
+      document.getElementById('otpSection').classList.remove('hidden');
+      document.getElementById('otp').focus();
+      startResendTimer();
     }
 
     // Age calculation
     document.getElementById('dob').addEventListener('change', function() {
       clearError('dob');
       const dob = new Date(this.value);
-      if (isNaN(dob)) return showError('dob','Invalid date');
-      if (dob > new Date()) return showError('dob','Date in future');
-      const age = Math.abs(new Date(Date.now() - dob.getTime()).getUTCFullYear() - 1970);
+      if (isNaN(dob.getTime())) return showError('dob', 'Invalid date');
+      
+      const today = new Date();
+      if (dob > today) return showError('dob', 'Date cannot be in the future');
+      
+      let age = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      
       document.getElementById('age').value = age;
     });
 
-    // Map & location
-    const map = L.map('map').setView([20, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-    let marker;
-    function fillLocation(lat,lng) {
-      document.getElementById('latitude').value = lat.toFixed(6);
-      document.getElementById('longitude').value = lng.toFixed(6);
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-        .then(r=>r.json())
-        .then(d=>document.getElementById('location').value=d.display_name||'')
-        .catch(_=>document.getElementById('location').value=`${lat.toFixed(6)},${lng.toFixed(6)}`);
-    }
-    map.on('click', e => {
-      if (marker) map.removeLayer(marker);
-      marker = L.marker(e.latlng).addTo(map);
-      fillLocation(e.latlng.lat, e.latlng.lng);
-      clearError('location');
-    });
-    document.getElementById('btnLocate').addEventListener('click', () => {
-      navigator.geolocation.getCurrentPosition(pos => {
-        const {latitude:lat,longitude:lng}=pos.coords;
-        map.setView([lat,lng],14);
-        if (marker) map.removeLayer(marker);
-        marker = L.marker([lat,lng]).addTo(map);
-        fillLocation(lat,lng);
-        clearError('location');
-      },()=>showError('location','Could not get location'));
+    // Password visibility toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
     });
 
-    // Registration submission
-    document.getElementById('regForm').addEventListener('submit', async e => {
+    // Location handling
+    function updateLocation(lat, lng) {
+      // Update map view
+      map.setView([lat, lng], 14);
+      
+      // Update or create marker
+      if (marker) {
+        marker.setLatLng([lat, lng]);
+      } else {
+        marker = L.marker([lat, lng]).addTo(map);
+      }
+      
+      // Update form fields
+      document.getElementById('latitude').value = lat.toFixed(6);
+      document.getElementById('longitude').value = lng.toFixed(6);
+      
+      // Reverse geocode to get address
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+          const address = data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          document.getElementById('location').value = address;
+        })
+        .catch(() => {
+          document.getElementById('location').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        });
+      
+      clearError('location');
+    }
+
+    // Map click handler
+    map.on('click', function(e) {
+      updateLocation(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Current location button
+    document.getElementById('btnLocate').addEventListener('click', function() {
+      if (!navigator.geolocation) {
+        showError('location', 'Geolocation is not supported by your browser');
+        return;
+      }
+      
+      toggleLoading('btnLocate', true);
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          updateLocation(position.coords.latitude, position.coords.longitude);
+          toggleLoading('btnLocate', false);
+        },
+        error => {
+          showError('location', 'Unable to retrieve your location');
+          console.error('Geolocation error:', error);
+          toggleLoading('btnLocate', false);
+        },
+        { timeout: 10000 }
+      );
+    });
+
+    // Form validation
+    function validateForm() {
+      let isValid = true;
+      
+      // Validate name
+      const name = document.getElementById('name').value.trim();
+      if (name.length < 2) {
+        showError('name', 'Please enter your full name');
+        isValid = false;
+      }
+      
+      // Validate DOB
+      const dob = document.getElementById('dob').value;
+      if (!dob) {
+        showError('dob', 'Please select your date of birth');
+        isValid = false;
+      }
+      
+      // Validate location
+      if (!marker) {
+        showError('location', 'Please select your location on the map');
+        isValid = false;
+      }
+      
+      // Validate email
+      const email = document.getElementById('email').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('email', 'Please enter a valid email address');
+        isValid = false;
+      }
+      
+      // Validate phone
+      const phone = document.getElementById('phone').value.trim();
+      if (!/^\d{10}$/.test(phone)) {
+        showError('phone', 'Please enter a 10-digit phone number');
+        isValid = false;
+      }
+      
+      // Validate password
+      const password = document.getElementById('password').value;
+      if (password.length < 8) {
+        showError('password', 'Password must be at least 8 characters');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+
+    // Registration form submission
+    document.getElementById('regForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      // validate fields...
-      // (same as before – see your original code) :contentReference[oaicite:0]{index=0}
-      // if valid:
-      const btn = document.getElementById('btnRegister');
-      btn.disabled = true; btn.textContent = 'Registering…';
+      
+      if (!validateForm()) return;
+      
+      toggleLoading('btnRegister', true);
+      
       try {
         const payload = {
           full_name: document.getElementById('name').value.trim(),
-          dob:        document.getElementById('dob').value,
-          age:        document.getElementById('age').value,
-          email:      document.getElementById('email').value.trim(),
-          phone:      document.getElementById('phone').value.trim(),
-          password:   document.getElementById('password').value,
-          address:    document.getElementById('location').value,
-          latitude:   document.getElementById('latitude').value,
-          longitude:  document.getElementById('longitude').value
+          dob: document.getElementById('dob').value,
+          age: document.getElementById('age').value,
+          email: document.getElementById('email').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          password: document.getElementById('password').value,
+          address: document.getElementById('location').value,
+          latitude: document.getElementById('latitude').value,
+          longitude: document.getElementById('longitude').value
         };
-        const res = await fetch('https://cybvars-backend.onrender.com/api/register', {
-          method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+        
+        const response = await fetch('https://cybvars-backend-wh7p.onrender.com/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
-        const { success, message } = await res.json();
-        if (res.ok && success) {
-          // show OTP section
-          registeredEmail = payload.email;
-          document.getElementById('registeredEmail').textContent = registeredEmail;
-          document.getElementById('regForm').classList.add('hidden');
-          document.getElementById('otpSection').classList.remove('hidden');
-          showSuccess('otp','OTP sent to your email.');
-          startResendTimer();
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          showOTPSection(payload.email);
+          showSuccess('otp', 'Verification code sent to your email');
         } else {
-          showError('email', message || 'Registration failed');
+          showError('email', data.message || 'Registration failed. Please try again.');
         }
-      } catch {
-        showError('email','Network error');
+      } catch (error) {
+        console.error('Registration error:', error);
+        showError('email', 'Network error. Please check your connection.');
       } finally {
-        btn.disabled = false; btn.textContent = 'Register';
+        toggleLoading('btnRegister', false);
       }
     });
 
-    // Verify OTP
-    document.getElementById('otpForm').addEventListener('submit', async e => {
+    // OTP form submission
+    document.getElementById('otpForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const code = document.getElementById('otp').value.trim();
-      if (!/^\d{6}$/.test(code)) return showError('otp','Enter 6-digit OTP');
-      const btn = document.getElementById('btnVerify');
-      btn.disabled = true; btn.textContent = 'Verifying…';
+      
+      const otp = document.getElementById('otp').value.trim();
+      if (!/^\d{6}$/.test(otp)) {
+        showError('otp', 'Please enter a 6-digit code');
+        return;
+      }
+      
+      toggleLoading('btnVerify', true);
+      
       try {
-        const res = await fetch('https://cybvars-backend.onrender.com/api/verify-otp', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ email: registeredEmail, otp: code })
+        const response = await fetch('https://cybvars-backend-wh7p.onrender.com/api/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: registeredEmail, 
+            otp: otp 
+          })
         });
-        const { success, message } = await res.json();
-        if (res.ok && success) {
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
           window.location.href = 'login.html?registered=true';
         } else {
-          showError('otp', message || 'OTP failed');
+          showError('otp', data.message || 'Invalid verification code');
         }
-      } catch {
-        showError('otp','Network error');
+      } catch (error) {
+        console.error('Verification error:', error);
+        showError('otp', 'Network error. Please try again.');
       } finally {
-        btn.disabled = false; btn.textContent = 'Verify OTP';
+        toggleLoading('btnVerify', false);
       }
     });
 
-    // Resend OTP
+    // Resend OTP functionality
     function startResendTimer() {
-      const btnR   = document.getElementById('btnResend'),
-            timerC = document.getElementById('resendTimer'),
-            cd     = document.getElementById('countdown');
-      btnR.classList.add('hidden'); timerC.classList.remove('hidden');
-      let t=30; cd.textContent=t;
-      const iv = setInterval(()=>{
-        if (--t<=0){ clearInterval(iv); timerC.classList.add('hidden'); btnR.classList.remove('hidden'); }
-        cd.textContent=t;
-      },1000);
+      const btnResend = document.getElementById('btnResend');
+      const resendTimer = document.getElementById('resendTimer');
+      const countdown = document.getElementById('countdown');
+      
+      btnResend.classList.add('hidden');
+      resendTimer.classList.remove('hidden');
+      
+      let seconds = 30;
+      countdown.textContent = seconds;
+      
+      const timer = setInterval(() => {
+        seconds--;
+        countdown.textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(timer);
+          resendTimer.classList.add('hidden');
+          btnResend.classList.remove('hidden');
+        }
+      }, 1000);
     }
-    document.getElementById('btnResend').addEventListener('click', async function(){
+
+    document.getElementById('btnResend').addEventListener('click', async function() {
       this.classList.add('hidden');
       document.getElementById('resendTimer').classList.remove('hidden');
+      
       try {
-        const res = await fetch('https://cybvars-backend.onrender.com/api/resend-otp', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ email: registeredEmail })
+        const response = await fetch('https://cybvars-backend-wh7p.onrender.com/api/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: registeredEmail })
         });
-        const { success, message } = await res.json();
-        if (res.ok && success) {
-          showSuccess('otp','New OTP sent');
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          showSuccess('otp', 'New verification code sent');
           startResendTimer();
         } else {
-          showError('otp', message || 'Resend failed');
-          document.getElementById('btnResend').classList.remove('hidden');
+          showError('otp', data.message || 'Failed to resend code');
+          this.classList.remove('hidden');
         }
-      } catch {
-        showError('otp','Network error');        
-        document.getElementById('btnResend').classList.remove('hidden');
+      } catch (error) {
+        console.error('Resend error:', error);
+        showError('otp', 'Network error. Please try again.');
+        this.classList.remove('hidden');
       }
     });
+    
   </script>
 </body>
 </html>
