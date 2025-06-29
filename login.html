@@ -2,79 +2,378 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login | CybVars</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | CybVars Password Manager</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f4f7fa; color: #333; }
-    .container { max-width: 400px; margin: 5rem auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    h2 { text-align: center; margin-bottom: 1.5rem; }
-    label { display: block; margin-top: 1rem; font-weight: 600; }
-    input, button { width: 100%; padding: 0.75rem; margin-top: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
-    button { background: #4c51bf; color: #fff; border: none; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #5a67d8; }
-    .register-link { margin-top: 1rem; text-align: center; }
-    .register-link a { color: #4c51bf; text-decoration: none; }
-    .error { color: #e53e3e; font-size: 0.9rem; margin-top: 0.5rem; }
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --danger: #e53e3e;
+      --light: #f8f9fa;
+      --dark: #1a202c;
+      --gray: #718096;
+      --light-gray: #e2e8f0;
+      --border-radius: 8px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSg2Nyw5NywyMzgsMC4wNSkiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .back-btn:hover {
+      color: var(--primary-dark);
+      transform: translateX(-3px);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), #3a0ca3);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo img {
+      height: 48px;
+      margin-bottom: 0.5rem;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.875rem 1rem 0.875rem 2.5rem;
+      border: 1px solid var(--light-gray);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+      background-color: var(--light);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--gray);
+      transition: var(--transition);
+    }
+
+    .password-toggle:hover {
+      color: var(--primary);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .additional-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
+    }
+
+    .additional-links a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .additional-links a:hover {
+      text-decoration: underline;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--gray);
+    }
+
+    .register-link a {
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 1.5rem;
+      }
+
+      .back-btn {
+        top: 1rem;
+        left: 1rem;
+      }
+
+      .additional-links {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
-  <a href="index.html" style="position:absolute;top:20px;left:20px;color:#4c51bf;text-decoration:none;">
-    &#8592; Back
+  <a href="index.html" class="back-btn">
+    <i class="fas fa-arrow-left"></i>
+    <span>Back to Home</span>
   </a>
 
-  <div class="container">
-    <h2>CybVars Login</h2>
+  <div class="login-container">
+    <div class="logo">
+      <img src="logo.png" alt="CybVars Logo">
+      <h1>CybVars</h1>
+    </div>
+    
+    <h2>Welcome Back</h2>
+    
     <form id="loginForm">
-      <label for="email">Email</label>
-      <input type="email" id="email" required>
-      <label for="password">Password</label>
-      <input type="password" id="password" required>
-      <button type="submit">Login</button>
-      <div id="errorMessage" class="error"></div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" id="password" placeholder="••••••••" required>
+          <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+      </div>
+      
+      <div id="errorMessage" class="error-message" style="display: none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText"></span>
+      </div>
+      
+      <button type="submit" class="btn">Log In</button>
+      
+      <div class="additional-links">
+        <a href="forgot-password.html">Forgot password?</a>
+        <a href="resend-verification.html">Resend verification</a>
+      </div>
     </form>
+    
     <div class="register-link">
-      <p>Don't have an account? <a href="register.html">Register</a></p>
+      <p>Don't have an account? <a href="register.html">Create one</a></p>
     </div>
   </div>
-<audio id="bg-music" autoplay loop>
-  <source src="background.mp3" type="audio/mpeg">
-  Your browser does not support the audio tag.
-</audio>
-<script src="music.js"></script> <!-- Your new music logic -->
+
+  <audio id="bg-music" loop>
+    <source src="background.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script src="music.js"></script>
   <script>
-   // login.html
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-  const errorBox = document.getElementById('errorMessage');
-  errorBox.textContent = '';
+    document.addEventListener('DOMContentLoaded', function() {
+      // Password visibility toggle
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+      
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
 
-  try {
-    const res = await fetch('https://cybvars-backend.onrender.com/api/login', {
-      method: 'POST',
-      credentials: 'include',               // ◀ add this line
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      // Form submission
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const errorBox = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        
+        // Clear previous errors
+        errorBox.style.display = 'none';
+        errorText.textContent = '';
+        
+        try {
+          const res = await fetch('https://cybvars-backend-wh7p.onrender.com/api/login', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            // Show error with shake animation
+            errorText.textContent = data.message || 'Login failed. Please check your credentials.';
+            errorBox.style.display = 'flex';
+            errorBox.classList.add('shake');
+            setTimeout(() => errorBox.classList.remove('shake'), 400);
+            return;
+          }
+
+          if (data.verified === false) {
+            window.location.href = `register.html?email=${encodeURIComponent(email)}&action=verify`;
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } catch (err) {
+          errorText.textContent = 'Network error. Please check your connection and try again.';
+          errorBox.style.display = 'flex';
+          errorBox.classList.add('shake');
+          setTimeout(() => errorBox.classList.remove('shake'), 400);
+        }
+      });
+      
+      // Lower music volume
+      const music = document.getElementById('bg-music');
+      if (music) music.volume = 0.3;
     });
-    const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      errorBox.textContent = data.message || 'Login failed. Please try again.';
-      return;
-    }
-
-    if (data.verified === false) {
-      window.location.href =
-        `register.html?email=${encodeURIComponent(email)}&action=verify`;
-    } else {
-      window.location.href = 'dashboard.html';
-    }
-  } catch {
-    errorBox.textContent = 'Network error. Please try again.';
-  }
-});
-
   </script>
 </body>
 </html>
